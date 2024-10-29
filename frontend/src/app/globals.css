@@ -7,7 +7,7 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
@@ -25,3 +25,13 @@ body {
     text-wrap: balance;
   }
 }
+
+
+/*
+  - Possible colour pallete for the app
+  - #FF9F1C
+  - #FFBF69
+  - white
+  - #CBF3F0
+  - #2EC4B6 
+*/
