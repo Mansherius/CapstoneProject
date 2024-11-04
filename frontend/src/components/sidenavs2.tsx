@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 
-const SideNav2 = () => {
+const SideNav = () => {
   return (
     <aside className="h-full p-4 flex flex-col items-center md:w-80">
 	{/* <div className="flex flex-col items-center w-16 h-full overflow-hidden text-indigo-300 bg-indigo-900 rounded">
@@ -116,4 +116,4 @@ const SideNav2 = () => {
   )
 }
 
-export default SideNav2
+export default SideNav
