@@ -7,7 +7,7 @@ export default function Home() {
       className="bg-custom-radial flex flex-col items-center justify-between min-h-screen md:p-8 pb-20 px-4 pt-10 sm:p-10 font-[family-name:var(--font-geist-sans)] overflow-hidden"
       style={{
         background:
-          "linear-gradient(153deg, rgba(210,160,255,1) 9%, rgba(255,255,255,1) 63%)"
+          "linear-gradient(153deg, rgba(159,168,218,1) 31%, rgba(255,255,255,1) 79%)"
       }}
     >
       {/* Intro Section */}
