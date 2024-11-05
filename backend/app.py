@@ -1,19 +1,22 @@
-from flask import Flask, jsonify
-from owlready2 import get_ontology
+from flask import Flask, jsonify, request
 from flask_cors import CORS
-
-app = Flask(__name__)
-CORS(app)  # Enable Cross-Origin Resource Sharing (CORS)
+from owlready2 import get_ontology
+import pandas as pd
+import re
 
 # Load the OWL ontology file
-ontology_path = "/Users/manshersingh/Documents/Coding Projects/capstoneProject/data/indian_food_ontology_v1.owl"
-onto = get_ontology(ontology_path).load()
+ontology_path = "../data/indian_food_ontology_v1.owl"
+ontology = get_ontology(ontology_path).load()
+
+# Set up Flask app
+app = Flask(__name__)
+CORS(app)
 
 # API to get all classes in the ontology
 @app.route('/api/classes', methods=['GET'])
 def get_classes():
     try:
-        classes = [cls.name for cls in onto.classes()]  # Fetch all classes
+        classes = [cls.name for cls in ontology.classes()]  # Fetch all classes
         return jsonify(classes)  # Return the classes in JSON format
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -23,7 +26,7 @@ def get_classes():
 def get_class_individuals(name):
     try:
         # Find the class by name in the ontology
-        cls = onto.search_one(iri="*" + name)
+        cls = ontology.search_one(iri="*" + name)
         if cls:
             individuals = [ind.name for ind in cls.instances()]  # Fetch individuals of the class
             return jsonify(individuals)
@@ -37,7 +40,7 @@ def get_class_individuals(name):
 def get_class_properties(name):
     try:
         # Find the class by name in the ontology
-        cls = onto.search_one(iri="*" + name)
+        cls = ontology.search_one(iri="*" + name)
         if cls:
             properties = [prop.name for prop in cls.get_properties()]  # Fetch properties of the class
             return jsonify(properties)
@@ -46,6 +49,6 @@ def get_class_properties(name):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Start the Flask app on a specified port (e.g., port 5000)
+# Start the Flask app on a specified port (e.g., port 5001)
 if __name__ == '__main__':
-    app.run(debug=True, port=6000)
+    app.run(debug=True, port=5001)

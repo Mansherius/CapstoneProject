@@ -10,3 +10,6 @@ Furthermore, the project is divided among 3 ASP Students (Advanced Studies in PG
 
 ### Project Details
 - The Food Knowledge Graph (FKG) is an .OWL file and requires GraphDB to access and visualise it. As such SPARQL queries are required to access and retrieve the data. As these queries are quite cumbersome, I will be attempting to make the process easier by designing and creating an app that will streamline this process.
+
+
+- KASHMIRI NAME FOR CARDAMOM HAS ERROR TOKENS -> Have deleted them and the spaces.
