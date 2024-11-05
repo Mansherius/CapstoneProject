@@ -6,7 +6,9 @@ import React from 'react'
 const formsQuery = () => {
   return (
     <main>
-      <h1 className='font-bold'>Knowledge Graph Forms Query</h1>
+      <div className='font-bold text-4xl flex justify-center items-center py-2'>
+          Knowledge Graph Forms Query
+      </div>
       <DynamicForm />
     </main>
   )
