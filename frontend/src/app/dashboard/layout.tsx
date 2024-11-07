@@ -7,7 +7,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <SideNav />
 
       {/* Main Content Area */}
-      <main className="flex-grow p-4 overflow-y-auto md:p-4 my-2 md:my-4 mx-4 md:mx-2 bg-indigo-100 rounded ">
+      <main className="flex-grow p-4 overflow-y-auto md:p-4 my-2 md:my-4 mx-4 md:mx-2 bg-indigo-100 rounded font-[family-name:var(--font-geist-sans)]">
         {children}
       </main>
     </div>
