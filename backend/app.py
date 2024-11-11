@@ -5,7 +5,7 @@ import pandas as pd
 import re
 
 # Load the OWL ontology file
-ontology_path = "../data/indian_food_ontology_v1.owl"
+ontology_path = "../data/final_ifct_csv_json.owl"
 ontology = get_ontology(ontology_path).load()
 
 # Set up Flask app
@@ -48,6 +48,8 @@ def get_class_properties(name):
             return jsonify({"error": "Class not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+# API to get the format of our owl file in order to understand the data
 
 # Start the Flask app on a specified port (e.g., port 5001)
 if __name__ == '__main__':

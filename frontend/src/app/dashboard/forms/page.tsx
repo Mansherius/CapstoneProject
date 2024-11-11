@@ -1,130 +1,60 @@
 "use client";
 
-import React, { useState } from "react";
-import ComboBox from "@/components/ui/comboBox";
-import { PlusIcon } from "@radix-ui/react-icons";
+import React, { useState, useEffect } from "react";
+import SpecificRecipeForm from "@/components/SpecificRecipeForm";
+import RecipeResults from "@/components/recipeResults";
 
-// Example options for the ComboBox
-const parameterOptions = ["Ingredient", "Cook Time", "Cuisine"];
-const ingredientOptions = ["Apple", "Banana", "Cherry"];
-const cookTimeOptions = ["15 minutes", "30 minutes", "1 hour"];
-
-type ParameterValuePair = {
-	parameter: string;
-	value: string;
+type RecipeResult = {
+  name: string;
+  description: string;
+  cookTime: string;
+  ingredients: string[];
 };
 
-const formsQuery = () => {
-	// State array to hold multiple parameter-value pairs
-	const [parameterValuePairs, setParameterValuePairs] = useState<
-		ParameterValuePair[]
-	>([]);
+const FormsQuery = () => {
+  const [results, setResults] = useState<RecipeResult[]>([]);
+  const [filteredResults, setFilteredResults] = useState<RecipeResult[]>([]);
 
-	// Add a new parameter-value pair on button click
-	const addParameter = () => {
-		setParameterValuePairs([
-			...parameterValuePairs,
-			{ parameter: "", value: "" }, // Add an empty pair for new ComboBoxes
-		]);
-	};
+  const handleFormSubmit = (formData: { parameter: string; value: string; values: string[]; avoidValues: string[] }[]) => {
+    console.log("Form Data Submitted:", formData);
+    // Simulate fetching results based on form data
+    const fetchedResults: RecipeResult[] = [
+      {
+        name: "Spicy Tomato Pasta",
+        description: "A delicious and spicy pasta dish made with fresh tomatoes and herbs.",
+        cookTime: "30 minutes",
+        ingredients: ["Tomatoes", "Garlic", "Pasta", "Chili Flakes", "Basil"],
+      },
+      {
+        name: "Vegetable Stir Fry",
+        description: "A quick and healthy stir fry made with seasonal vegetables.",
+        cookTime: "20 minutes",
+        ingredients: ["Broccoli", "Carrot", "Bell Pepper", "Soy Sauce", "Garlic"],
+      },
+    ];
+    setResults(fetchedResults);
+  };
 
-	// Handle parameter selection
-	const handleParameterSelect = (index: number, parameter: string) => {
-		const updatedPairs = [...parameterValuePairs];
-		updatedPairs[index] = { ...updatedPairs[index], parameter, value: "" };
-		setParameterValuePairs(updatedPairs);
-	};
+  useEffect(() => {
+    // Filter results based on form data
+    const filtered = results.filter((recipe) => {
+      const ingredientsToMatch = results.flatMap((r) => r.ingredients);
+      return recipe.ingredients.every((ingredient) => ingredientsToMatch.includes(ingredient));
+    });
+    setFilteredResults(filtered);
+  }, [results]);
 
-	// Handle value selection
-	const handleValueSelect = (index: number, value: string) => {
-		const updatedPairs = [...parameterValuePairs];
-		updatedPairs[index] = { ...updatedPairs[index], value };
-		setParameterValuePairs(updatedPairs);
-	};
-
-	// Define options based on selected parameter
-	const getOptions = (parameter: string) => {
-		switch (parameter) {
-			case "Ingredient":
-				return ingredientOptions;
-			case "Cook Time":
-				return cookTimeOptions;
-			default:
-				return [];
-		}
-	};
-
-	return (
-		<div>
-			<div className="font-bold text-4xl flex justify-center items-center py-2 text-indigo-700">
-				Knowledge Graph Form Querying
-			</div>
-			<main className="flex gap-8 p-4">
-				<div>
-					<p className="text-lg">
-						Please select one or more parameters for the search{" "}
-					</p>
-
-					{/* Render a ComboBox for each parameter-value pair with numbered label */}
-					{parameterValuePairs.map((pair, index) => (
-						<div key={index} className="flex items-center space-x-2 p-2">
-							{/* Label with numbered item */}
-							<span className="font-semibold text-indigo-700">
-								{index + 1}.
-							</span>
-
-							<div className="flex space-x-2">
-								{/* Parameter ComboBox */}
-								<ComboBox
-									options={parameterOptions}
-									value={pair.parameter}
-									onSelect={(parameter) =>
-										handleParameterSelect(index, parameter)
-									}
-									placeholder="Select Parameter"
-								/>
-
-								{/* Value ComboBox, shows options based on selected parameter */}
-								{pair.parameter && (
-									<ComboBox
-										options={getOptions(pair.parameter)}
-										value={pair.value}
-										onSelect={(value) => handleValueSelect(index, value)}
-										placeholder={`Select ${pair.parameter}`}
-									/>
-								)}
-							</div>
-						</div>
-					))}
-
-					{/* Button to add new parameter */}
-					<div className="flex items-center space-x-2 mt-2">
-						<button
-							onClick={addParameter}
-							className="flex items-center space-x-1 text-indigo-700 hover:text-indigo-500"
-						>
-							<PlusIcon /> <span>Add a new parameter</span>
-						</button>
-					</div>
-
-					{/* Submit button */}
-					<div className="pt-6 flex justify-end">
-						<button
-							onClick={() =>
-								console.log("Submitted values:", parameterValuePairs)
-							}
-							className="bg-indigo-800 text-indigo-300 font-bold py-3 px-6 rounded hover:bg-indigo-600"
-						>
-							Submit
-						</button>
-					</div>
-				</div>
-
-				{/* Second Div where the results will be loaded */}
-				<div>Hello there</div>
-			</main>
-		</div>
-	);
+  return (
+    <div className="p-5 bg-white rounded-lg shadow-md">
+      <main className="flex flex-col gap-2">
+        <SpecificRecipeForm onFormSubmit={handleFormSubmit} />
+        <div className="text-lg text-gray-700 mb-4">
+          Found {filteredResults.length} results that match your search.
+        </div>
+        <RecipeResults results={filteredResults} />
+      </main>
+    </div>
+  );
 };
 
-export default formsQuery;
+export default FormsQuery;
