@@ -54,7 +54,7 @@ const AutocompletePopover: React.FC<{
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder={placeholder}
-          className="w-full p-2 border border-gray-300 rounded-md"
+          className="p-2 border border-gray-300 rounded-md"
         />
       </PopoverTrigger>
       <PopoverContent className="w-64">

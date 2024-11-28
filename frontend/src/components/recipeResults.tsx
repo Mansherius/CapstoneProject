@@ -12,8 +12,8 @@ type RecipeResultsProps = {
 const RecipeResults: React.FC<RecipeResultsProps> = ({ results }) => {
   if (results.length === 0) {
     return (
-      <div className="p-4 text-gray-600">
-        No results found. Please adjust your search criteria and try again.
+      <div className="p-4 text-xl text-indigo-600 font-semibold text-center">
+        No Results Found.
       </div>
     );
   }

@@ -1,8 +1,11 @@
 import React from 'react'
 import Image from 'next/image'
+import { Tooltip } from "@/components/ui/toolTip";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 const SideNav = () => {
   return (
+	<TooltipProvider>
     <aside className="h-full p-4 flex flex-col items-center md:w-80">
 	{/* <div className="flex flex-col items-center w-16 h-full overflow-hidden text-indigo-300 bg-indigo-900 rounded">
 		<a className="flex items-center justify-center mt-3" href="#">
@@ -81,12 +84,15 @@ const SideNav = () => {
 					</svg>
 					<span className="ml-2 text-md font-medium">Dashboard Instructions</span>
 				</a>
-				<a className="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-indigo-700" href="/dashboard/nlp">
+				<Tooltip content="Currently disabled">
+				<a className="flex items-center w-full h-12 px-3 mt-2 rounded" href=""> 
+				{/* /dashboard/nlp is the value to put in href*/}
 					<svg className="w-6 h-6 stroke-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
 					</svg>
 					<span className="ml-2 text-md font-medium">NLP Search</span>
 				</a>
+				</Tooltip>
 				<a className="flex items-center w-full h-12 px-3 mt-2 hover:bg-indigo-700 rounded" href="/dashboard/forms">
 				<svg className="w-6 h-6 stroke-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 2H5a2 2 0 00-2 2v16a2 2 0 002 2h14a2 2 0 002-2V8l-6-6H9z" />
@@ -113,6 +119,7 @@ const SideNav = () => {
 	{/* <!-- Component End  --> */}
 
 </aside>
+</TooltipProvider>
   )
 }
 

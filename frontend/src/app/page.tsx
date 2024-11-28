@@ -1,8 +1,11 @@
 import { BackgroundBeams } from "@/components/ui/backgroundBeams";
 import Image from "next/image";
+import { Tooltip } from "@/components/ui/toolTip";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 export default function Home() {
   return (
+    <TooltipProvider>
     <div
       className="bg-custom-radial flex flex-col items-center justify-between min-h-screen md:p-8 pb-20 px-4 pt-10 sm:p-10 font-[family-name:var(--font-geist-sans)] overflow-hidden"
       style={{
@@ -39,14 +42,17 @@ export default function Home() {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+          <Tooltip content="Currently Disabled">
           <a
             className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="/dashboard/nlp"
+            href=""
+            // /dashboard/nlp is the value to put in href
             target=""
             rel="noopener noreferrer"
           >
             NLP Query
           </a>
+          </Tooltip>
           <a
             className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
             href="/dashboard/forms"
@@ -100,5 +106,6 @@ export default function Home() {
       {/* Background Beams */}
       <BackgroundBeams className="z-0 absolute inset-0" />
     </div>
+    </TooltipProvider>
   );
 }
