@@ -22,7 +22,7 @@ def get_autocomplete_suggestions(query):
     return suggestions
 
 
-@autocomplete_bp.route("/autocomplete", methods=["GET"])
+@autocomplete_bp.route("/api/autocomplete", methods=["GET"])
 def autocomplete():
     """
     API endpoint for autocomplete suggestions.
