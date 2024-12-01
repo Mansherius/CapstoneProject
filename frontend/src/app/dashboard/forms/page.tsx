@@ -29,26 +29,36 @@ const FormsQuery = () => {
 	const handleSearchByName = async () => {
 		console.log("Searching by Recipe Name:", searchQuery);
 		setIsLoading(true);
-
+	  
 		try {
-			const response = await fetch(
-				`http://127.0.0.1:5001/api/search-by-name?query=${searchQuery}`
-			);
-
-			if (!response.ok) {
-				throw new Error("Failed to fetch search results");
-			}
-
-			const data = await response.json();
-			console.log("API Response:", data); // Inspect the data structure
-			setResults(data); // Directly set results to pass to RecipeResults
+		  const response = await fetch(`http://127.0.0.1:5001/api/search-by-name?query=${searchQuery}`, {
+			method: "GET",
+			headers: {
+			  "Content-Type": "application/json",
+			},
+		  });
+	  
+		  if (!response.ok) {
+			throw new Error("Failed to fetch search results");
+		  }
+	  
+		  const data = await response.json();
+	  
+		  // Map backend response dynamically to include all properties
+		  const formattedResults: RecipeResult[] = data.map((item: any) => ({
+			name: item.name,
+			properties: item.properties || {}, // Dynamically include all properties
+			type: item.type || "N/A",
+		  }));
+	  
+		  setResults(formattedResults);
 		} catch (error) {
-			console.error("Error searching for recipes:", error);
-			setResults([]); // Clear results on error
+		  console.error("Error searching for recipes:", error);
+		  setResults([]); // Clear results on error
 		} finally {
-			setIsLoading(false);
+		  setIsLoading(false);
 		}
-	};
+	  };
 
 	
 	return (
@@ -57,7 +67,7 @@ const FormsQuery = () => {
 				{/* Welcome Section */}
 				<div className="bg-indigo-100 p-6 rounded-md shadow-md mb-6 text-center">
 					<h1 className="font-bold text-5xl text-indigo-800 mb-4">
-						Insert Temp Name
+					Rasoi Genie
 					</h1>
 					<h2 className="font-bold text-4xl text-indigo-800 mb-4">
 						Welcome to Your Recipe Finder!
@@ -127,7 +137,7 @@ const FormsQuery = () => {
 				</div>
 
 				{/* Results */}
-				<div className="w-full max-w-2xl mx-auto">
+				<div className="w-full max-w-2xl mx-auto overflow-auto">
 					<RecipeResults results={results} />
 				</div>
 			</div>
