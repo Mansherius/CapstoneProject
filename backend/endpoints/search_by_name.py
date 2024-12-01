@@ -25,4 +25,5 @@ def search_by_name():
     if not results:
         return jsonify({"error": f"No recipe found for '{query}'"}), 404
 
+    # print("Backend Output:", results)  # Add this for debugging
     return jsonify(results), 200
