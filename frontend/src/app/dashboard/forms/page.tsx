@@ -9,16 +9,15 @@ import { TooltipProvider } from "@radix-ui/react-tooltip";
 type RecipeResult = {
 	name: string;
 	properties: {
-	  hasCookTime?: string[];
-	  hasActualIngredients?: string[];
-	  hasInstructions?: string[];
-	  hasCuisine?: string[];
-	  hasDiet?: string[];
-	  hasCourse?: string[];
+		hasCookTime?: string[];
+		hasActualIngredients?: string[];
+		hasInstructions?: string[];
+		hasCuisine?: string[];
+		hasDiet?: string[];
+		hasCourse?: string[];
 	};
 	type: string;
-  };
-  
+};
 
 const FormsQuery = () => {
 	const [results, setResults] = useState<RecipeResult[]>([]);
@@ -26,49 +25,86 @@ const FormsQuery = () => {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 
+	// Search by name function
 	const handleSearchByName = async () => {
 		console.log("Searching by Recipe Name:", searchQuery);
 		setIsLoading(true);
-	  
-		try {
-		  const response = await fetch(`http://127.0.0.1:5001/api/search-by-name?query=${searchQuery}`, {
-			method: "GET",
-			headers: {
-			  "Content-Type": "application/json",
-			},
-		  });
-	  
-		  if (!response.ok) {
-			throw new Error("Failed to fetch search results");
-		  }
-	  
-		  const data = await response.json();
-	  
-		  // Map backend response dynamically to include all properties
-		  const formattedResults: RecipeResult[] = data.map((item: any) => ({
-			name: item.name,
-			properties: item.properties || {}, // Dynamically include all properties
-			type: item.type || "N/A",
-		  }));
-	  
-		  setResults(formattedResults);
-		} catch (error) {
-		  console.error("Error searching for recipes:", error);
-		  setResults([]); // Clear results on error
-		} finally {
-		  setIsLoading(false);
-		}
-	  };
 
-	
+		try {
+			const response = await fetch(
+				`http://127.0.0.1:5001/api/search-by-name?query=${searchQuery}`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			if (!response.ok) {
+				throw new Error("Failed to fetch search results");
+			}
+
+			const data = await response.json();
+
+			// Map backend response dynamically to include all properties
+			const formattedResults: RecipeResult[] = data.map((item: any) => ({
+				name: item.name,
+				properties: item.properties || {}, // Dynamically include all properties
+				type: item.type || "N/A",
+			}));
+
+			setResults(formattedResults);
+		} catch (error) {
+			console.error("Error searching for recipes:", error);
+			setResults([]); // Clear results on error
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	// Handle form submission from SpecificRecipeForm
+	const handleSearchByDetails = async (formData: any) => {
+		console.log("Searching by Dish Properties:", formData);
+		setIsLoading(true);
+
+		try {
+			const response = await fetch("http://127.0.0.1:5001/api/search-by-details", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(formData),
+			});
+
+			if (!response.ok) {
+				throw new Error("Failed to fetch search results");
+			}
+
+			const data = await response.json();
+
+			// Map backend response dynamically to include all properties
+			const formattedResults: RecipeResult[] = data.map((item: any) => ({
+				name: item.name,
+				properties: item.properties || {}, // Dynamically include all properties
+				type: item.type || "N/A",
+			}));
+
+			setResults(formattedResults);
+		} catch (error) {
+			console.error("Error searching for recipes:", error);
+			setResults([]); // Clear results on error
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	return (
 		<TooltipProvider>
 			<div className="p-5 bg-white rounded-lg shadow-md">
 				{/* Welcome Section */}
 				<div className="bg-indigo-100 p-6 rounded-md shadow-md mb-6 text-center">
-					<h1 className="font-bold text-5xl text-indigo-800 mb-4">
-					Rasoi Genie
-					</h1>
+					<h1 className="font-bold text-5xl text-indigo-800 mb-4">Masala Match</h1>
 					<h2 className="font-bold text-4xl text-indigo-800 mb-4">
 						Welcome to Your Recipe Finder!
 					</h2>
@@ -130,9 +166,7 @@ const FormsQuery = () => {
 							</button>
 						</div>
 					) : (
-						<SpecificRecipeForm
-							onFormSubmit={(formData) => console.log(formData)}
-						/>
+						<SpecificRecipeForm onFormSubmit={handleSearchByDetails} />
 					)}
 				</div>
 

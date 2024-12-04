@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import ChipSelector from "@/components/ui/chipSelector";
-import { AutocompletePopover } from "@/components/ui/popover";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { Tooltip } from "@/components/ui/toolTip";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
@@ -143,7 +142,7 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 		fetchOptions();
 	}, []);
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		const isFormEmpty = parameterValuePairs.every(
 			(pair) =>
 				!pair.parameter ||
@@ -151,19 +150,34 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 					pair.values.length === 0 &&
 					pair.avoidValues.length === 0)
 		);
-
+	
 		if (isFormEmpty) {
 			alert("Please add at least one parameter or value before submitting.");
 			return;
 		}
-
-		setIsLoading(true); // Start loading
-		setTimeout(() => {
-			onFormSubmit(parameterValuePairs);
-			setIsLoading(false); // Stop loading
-		}, 2000); // Simulate an API call delay
+	
+		try {
+			setIsLoading(true);
+	
+			// Sync customInput to value whenever customInput is present
+			const updatedPairs = parameterValuePairs.map((pair) => {
+				if (pair.customInput) {
+					return { ...pair, value: pair.customInput }; // Override value with customInput
+				}
+				return pair;
+			});
+	
+			console.log("Payload sent to backend:", updatedPairs);
+	
+			await onFormSubmit(updatedPairs);
+		} catch (error) {
+			console.error("Error submitting the form:", error);
+		} finally {
+			setIsLoading(false);
+		}
 	};
-
+	
+	
 	return (
 		<TooltipProvider>
 			<div className="p-4">
@@ -303,8 +317,8 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 										</button>
 									</div>
 
-									{/* Dropdown for "Other" */}
-									{pair.value === "Other" && (
+									{/* Dropdown for dynamic inputs */}
+									{!dynamicOptions.cuisine.chips.includes(pair.value) && (
 										<div className="relative">
 											<input
 												type="text"
@@ -321,7 +335,13 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 													setTimeout(() => {
 														setParameterValuePairs((prev) =>
 															prev.map((p, i) =>
-																i === index ? { ...p, showDropdown: false } : p
+																i === index
+																	? {
+																			...p,
+																			showDropdown: false,
+																			value: pair.customInput || pair.value,
+																	  }
+																	: p
 															)
 														);
 													}, 200); // Timeout ensures dropdown doesn't close immediately on selection
@@ -331,7 +351,11 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 													setParameterValuePairs((prev) =>
 														prev.map((p, i) =>
 															i === index
-																? { ...p, customInput: inputValue }
+																? {
+																		...p,
+																		customInput: inputValue,
+																		value: inputValue,
+																  }
 																: p
 														)
 													);
@@ -359,6 +383,7 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 																				? {
 																						...p,
 																						customInput: option,
+																						value: option,
 																						showDropdown: false,
 																				  }
 																				: p
@@ -432,7 +457,8 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 									</div>
 
 									{/* Dropdown for "Other" */}
-									{pair.value === "Other" && (
+									{/* Dropdown for dynamic inputs */}
+									{!dynamicOptions.diet.chips.includes(pair.value) && (
 										<div className="relative">
 											<input
 												type="text"
@@ -449,7 +475,13 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 													setTimeout(() => {
 														setParameterValuePairs((prev) =>
 															prev.map((p, i) =>
-																i === index ? { ...p, showDropdown: false } : p
+																i === index
+																	? {
+																			...p,
+																			showDropdown: false,
+																			value: pair.customInput || pair.value,
+																	  }
+																	: p
 															)
 														);
 													}, 200); // Timeout ensures dropdown doesn't close immediately on selection
@@ -459,7 +491,11 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 													setParameterValuePairs((prev) =>
 														prev.map((p, i) =>
 															i === index
-																? { ...p, customInput: inputValue }
+																? {
+																		...p,
+																		customInput: inputValue,
+																		value: inputValue,
+																  }
 																: p
 														)
 													);
@@ -487,6 +523,7 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 																				? {
 																						...p,
 																						customInput: option,
+																						value: option,
 																						showDropdown: false,
 																				  }
 																				: p
@@ -560,7 +597,8 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 									</div>
 
 									{/* Dropdown for "Other" */}
-									{pair.value === "Other" && (
+									{/* Dropdown for dynamic inputs */}
+									{!dynamicOptions.course.chips.includes(pair.value) && (
 										<div className="relative">
 											<input
 												type="text"
@@ -577,7 +615,13 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 													setTimeout(() => {
 														setParameterValuePairs((prev) =>
 															prev.map((p, i) =>
-																i === index ? { ...p, showDropdown: false } : p
+																i === index
+																	? {
+																			...p,
+																			showDropdown: false,
+																			value: pair.customInput || pair.value,
+																	  }
+																	: p
 															)
 														);
 													}, 200); // Timeout ensures dropdown doesn't close immediately on selection
@@ -587,7 +631,11 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 													setParameterValuePairs((prev) =>
 														prev.map((p, i) =>
 															i === index
-																? { ...p, customInput: inputValue }
+																? {
+																		...p,
+																		customInput: inputValue,
+																		value: inputValue,
+																  }
 																: p
 														)
 													);
@@ -615,6 +663,7 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 																				? {
 																						...p,
 																						customInput: option,
+																						value: option,
 																						showDropdown: false,
 																				  }
 																				: p
