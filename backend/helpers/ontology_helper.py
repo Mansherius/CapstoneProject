@@ -8,5 +8,24 @@ def load_ontology():
     ontology = get_ontology(ONTOLOGY_PATH).load()
     return ontology
 
+def format_recipe_data(individual):
+    """
+    Formats the recipe data for a given ontology individual.
+
+    Args:
+        individual: The ontology individual representing a recipe.
+
+    Returns:
+        dict: A dictionary containing the formatted recipe data.
+    """
+    return {
+        "name": individual.name,
+        "type": "Recipe",
+        "properties": {
+            prop.python_name: [str(v) for v in prop[individual]]
+            for prop in individual.get_properties()
+        },
+    }
+
 # Reuse the loaded ontology
 ontology = load_ontology()

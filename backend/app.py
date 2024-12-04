@@ -2,6 +2,8 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from endpoints.autocomplete import autocomplete_bp
 from endpoints.search_by_name import search_bp
+from endpoints.search_by_details import details_bp
+from endpoints.get_unique_vals import data_bp
 
 app = Flask(__name__)
 
@@ -11,6 +13,8 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 # Register blueprints
 app.register_blueprint(autocomplete_bp)
 app.register_blueprint(search_bp)
+app.register_blueprint(details_bp)
+app.register_blueprint(data_bp)
 
 # Global error handler for uncaught exceptions
 @app.errorhandler(Exception)

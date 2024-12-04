@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from helpers.ontology_helper import ontology  # Assuming ontology is properly loaded in this helper
+from helpers.ontology_helper import ontology, format_recipe_data
 
 search_bp = Blueprint("search_by_name", __name__)
 
@@ -12,15 +12,7 @@ def search_by_name():
     results = []
     for individual in ontology.individuals():
         if query in individual.name.lower():
-            recipe_data = {
-                "name": individual.name,
-                "type": "Recipe",
-                "properties": {
-                    prop.python_name: [str(v) for v in prop[individual]]
-                    for prop in individual.get_properties()
-                },
-            }
-            results.append(recipe_data)
+            results.append(format_recipe_data(individual))
 
     if not results:
         return jsonify({"error": f"No recipe found for '{query}'"}), 404
