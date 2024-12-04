@@ -14,14 +14,15 @@ const PopoverAnchor = PopoverPrimitive.Anchor;
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
->(({ className, align = "center", sideOffset = 4, ...props }, ref) => (
+>(({ className, align = "center", side = "bottom", sideOffset = 4, ...props }, ref) => (
   <PopoverPrimitive.Portal>
     <PopoverPrimitive.Content
       ref={ref}
       align={align}
+      side={side}
       sideOffset={sideOffset}
       className={cn(
-        "z-50 w-72 rounded-md border bg-white p-4 text-black shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 max-h-64 w-72 overflow-y-auto rounded-md border bg-white p-2 text-black shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         className
       )}
       {...props}
@@ -36,7 +37,8 @@ const AutocompletePopover: React.FC<{
   placeholder: string;
 }> = ({ options, onSelect, placeholder }) => {
   const [inputValue, setInputValue] = React.useState("");
-  const [filteredOptions, setFilteredOptions] = React.useState(options);
+  const [filteredOptions, setFilteredOptions] = React.useState<string[]>(options);
+  const [isOpen, setIsOpen] = React.useState(false); // Control dropdown visibility
 
   React.useEffect(() => {
     setFilteredOptions(
@@ -47,32 +49,36 @@ const AutocompletePopover: React.FC<{
   }, [inputValue, options]);
 
   return (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <input
           type="text"
           value={inputValue}
+          onFocus={() => setIsOpen(true)} // Open dropdown on focus
           onChange={(e) => setInputValue(e.target.value)}
           placeholder={placeholder}
-          className="p-2 border border-gray-300 rounded-md"
+          className="p-2 border border-gray-300 rounded-md w-60"
         />
       </PopoverTrigger>
-      <PopoverContent className="w-64">
-        <div className="flex flex-col space-y-1">
-          {filteredOptions.map((option) => (
-            <button
-              key={option}
-              onClick={() => {
-                onSelect(option);
-                setInputValue(option);
-              }}
-              className="text-left p-2 hover:bg-gray-100 rounded-md"
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      </PopoverContent>
+      {isOpen && filteredOptions.length > 0 && ( // Only render dropdown if options exist
+        <PopoverContent>
+          <div className="flex flex-col space-y-1">
+            {filteredOptions.map((option) => (
+              <button
+                key={option}
+                onClick={() => {
+                  onSelect(option);
+                  setInputValue(option);
+                  setIsOpen(false); // Close dropdown on selection
+                }}
+                className="text-left p-2 hover:bg-gray-100 rounded-md"
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </PopoverContent>
+      )}
     </Popover>
   );
 };

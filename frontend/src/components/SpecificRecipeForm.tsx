@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ChipSelector from "@/components/ui/chipSelector";
 import { AutocompletePopover } from "@/components/ui/popover";
 import { PlusIcon } from "@radix-ui/react-icons";
@@ -13,6 +13,8 @@ type ParameterValuePair = {
 	value: string;
 	values: string[];
 	avoidValues: string[];
+	customInput?: string; // Added customInput for dynamic input handling
+	showDropdown?: boolean;
 };
 
 type EnhancedRecipeFormProps = {
@@ -27,25 +29,8 @@ const parameterOptions = [
 	"Difficulty",
 	"Course",
 ];
-const ingredientOptions = [
-	"Bajra",
-	"Halloumi Cheese",
-	"Tomatoes",
-	"Red Bell Pepper",
-	"Garlic",
-	"Parsley Leaves",
-];
-const cuisineOptions = [
-	"Fusion",
-	"Italian",
-	"Indian",
-	"Chinese",
-	"Mexican",
-	"French",
-];
-const dietOptions = ["Vegetarian", "Eggetarian", "Vegan", "Non-Vegetarian"];
-const courseOptions = ["Appetizer", "Main Course", "Dessert"];
-const difficultyOptions = ["Easy", "Medium", "Hard"];
+
+const difficultyOptions = ["Easy", "Moderate", "Difficult"];
 
 const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 	onFormSubmit,
@@ -53,15 +38,18 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 	const [isLoading, setIsLoading] = useState(false);
 
 	const [parameterValuePairs, setParameterValuePairs] = useState<
-		ParameterValuePair[]
-	>([
-		{
-			parameter: "Ingredient",
-			value: "",
-			values: [] as string[],
-			avoidValues: [] as string[],
-		},
-	]);
+  ParameterValuePair[]
+>([
+  {
+    parameter: "Ingredient",
+    value: "",
+    values: [] as string[],
+    avoidValues: [] as string[],
+    customInput: "",
+    showDropdown: false,
+  },
+]);
+
 
 	const addParameter = () => {
 		setParameterValuePairs([
@@ -107,6 +95,54 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 		updatedPairs[index] = { ...updatedPairs[index], value: `${value} minutes` };
 		setParameterValuePairs(updatedPairs);
 	};
+
+	type DynamicOptionCategory = {
+		chips: string[];
+		dropdown: string[];
+	};
+
+	type DynamicOptions = {
+		cuisine: DynamicOptionCategory;
+		diet: DynamicOptionCategory;
+		course: DynamicOptionCategory;
+	};
+
+	const [dynamicOptions, setDynamicOptions] = useState<DynamicOptions>({
+		cuisine: { chips: [], dropdown: [] },
+		diet: { chips: [], dropdown: [] },
+		course: { chips: [], dropdown: [] },
+	});
+
+	useEffect(() => {
+		const fetchOptions = async () => {
+			try {
+				const response = await fetch("http://127.0.0.1:5001/api/unique-values");
+				if (!response.ok) {
+					throw new Error("Failed to fetch unique values");
+				}
+
+				const data = await response.json();
+
+				// Helper function to process top 6 and dropdown values
+				const processOptions = (values: [string, number][]) => {
+					const sorted = values.sort((a, b) => b[1] - a[1]); // Sort by count
+					const chips = sorted.slice(0, 6).map(([value]) => value);
+					const dropdown = sorted.slice(6).map(([value]) => value);
+					return { chips, dropdown };
+				};
+
+				setDynamicOptions({
+					cuisine: processOptions(data.hasCuisine),
+					diet: processOptions(data.hasDiet),
+					course: processOptions(data.hasCourse),
+				});
+			} catch (error) {
+				console.error("Error fetching dynamic options:", error);
+			}
+		};
+
+		fetchOptions();
+	}, []);
 
 	const handleSubmit = () => {
 		const isFormEmpty = parameterValuePairs.every(
@@ -161,7 +197,7 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 									<Tooltip content="Separate each of the Ingredients by commas">
 										<input
 											type="text"
-											className="w-42 p-2 border border-gray-300 rounded-md"
+											className="w-60 p-2 border border-gray-300 rounded-md"
 											placeholder="e.g., Bajra, Tomatoes, Garlic"
 											onChange={(e) =>
 												handleIngredientInputChange(index, e.target.value)
@@ -179,6 +215,46 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 												</div>
 											))}
 									</div>
+								</div>
+							)}
+
+							{pair.parameter === "Course" && (
+								<div className="mt-4">
+									<p className="text-md text-gray-700 mb-2">
+										Select the course of the meal:
+									</p>
+									<div className="flex flex-wrap gap-2 mb-4">
+										{dynamicOptions.course.chips.map((course, idx) => (
+											<button
+												key={idx}
+												onClick={() => handleValueSelect(index, course)}
+												className={`py-1 px-3 rounded-full ${
+													pair.value === course
+														? "bg-indigo-600 text-white"
+														: "bg-indigo-200 text-indigo-700 hover:bg-indigo-300"
+												}`}
+											>
+												{course}
+											</button>
+										))}
+										<button
+											onClick={() => handleValueSelect(index, "Other")}
+											className={`py-1 px-3 rounded-full ${
+												pair.value === "Other"
+													? "bg-red-600 text-white"
+													: "bg-red-200 text-red-700 hover:bg-red-300"
+											}`}
+										>
+											Other
+										</button>
+									</div>
+									{pair.value === "Other" && (
+										<AutocompletePopover
+											options={dynamicOptions.course.dropdown}
+											onSelect={(value) => handleValueSelect(index, value)}
+											placeholder="e.g., Appetizer, Dessert"
+										/>
+									)}
 								</div>
 							)}
 
@@ -214,60 +290,157 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 									</div>
 								</div>
 							)}
-
 							{pair.parameter === "Cuisine" && (
-								<div className="mt-4">
-									<p className="text-md text-gray-700 mb-2">
-										What type of cuisine are you in the mood for? Maybe
-										something exotic or comforting? Start typing to see
-										suggestions or pick one below:
-									</p>
-									<div className="flex flex-wrap gap-2 mb-4">
-										{cuisineOptions.map((cuisine, idx) => (
-											<button
-												key={idx}
-												onClick={() => handleValueSelect(index, cuisine)}
-												className={`py-1 px-3 rounded-full ${
-													pair.value === cuisine
-														? "bg-indigo-600 text-white"
-														: "bg-indigo-200 text-indigo-700 hover:bg-indigo-300"
-												}`}
-											>
-												{cuisine}
-											</button>
-										))}
-									</div>
-									<AutocompletePopover
-										options={cuisineOptions}
-										onSelect={(value) => handleValueSelect(index, value)}
-										placeholder="e.g., Italian, Indian, Chinese"
-									/>
-								</div>
-							)}
+  <div className="mt-4">
+    <p className="text-md text-gray-700 mb-2">
+      What type of cuisine are you in the mood for?
+    </p>
+
+    {/* Render chips for top 6 */}
+    <div className="flex flex-wrap gap-2 mb-4">
+      {dynamicOptions.cuisine.chips.map((cuisine, idx) => (
+        <button
+          key={idx}
+          onClick={() => {
+            setParameterValuePairs((prev) =>
+              prev.map((p, i) =>
+                i === index ? { ...p, value: cuisine } : p
+              )
+            );
+          }}
+          className={`py-1 px-3 rounded-full ${
+            pair.value === cuisine
+              ? "bg-indigo-600 text-white"
+              : "bg-indigo-200 text-indigo-700 hover:bg-indigo-300"
+          }`}
+        >
+          {cuisine}
+        </button>
+      ))}
+
+      {/* Render "Other" chip */}
+      <button
+        onClick={() => {
+          setParameterValuePairs((prev) =>
+            prev.map((p, i) =>
+              i === index
+                ? { ...p, value: "Other", customInput: "", showDropdown: true }
+                : p
+            )
+          );
+        }}
+        className={`py-1 px-3 rounded-full ${
+          pair.value === "Other"
+            ? "bg-red-600 text-white"
+            : "bg-red-200 text-red-700 hover:bg-red-300"
+        }`}
+      >
+        Other
+      </button>
+    </div>
+
+    {/* Dropdown for "Other" */}
+    {pair.value === "Other" && (
+      <div className="relative">
+        <input
+          type="text"
+          value={pair.customInput || ""}
+          placeholder="Type to search"
+          onFocus={() => {
+            setParameterValuePairs((prev) =>
+              prev.map((p, i) =>
+                i === index ? { ...p, showDropdown: true } : p
+              )
+            );
+          }}
+          onBlur={() => {
+            setTimeout(() => {
+              setParameterValuePairs((prev) =>
+                prev.map((p, i) =>
+                  i === index ? { ...p, showDropdown: false } : p
+                )
+              );
+            }, 200); // Timeout ensures dropdown doesn't close immediately on selection
+          }}
+          onChange={(e) => {
+            const inputValue = e.target.value;
+            setParameterValuePairs((prev) =>
+              prev.map((p, i) =>
+                i === index ? { ...p, customInput: inputValue } : p
+              )
+            );
+          }}
+          className="p-2 border border-gray-300 rounded-md w-60"
+        />
+
+        {pair.showDropdown && (
+          <div className="absolute top-full left-0 w-60 mt-1 max-h-40 overflow-y-auto border border-gray-300 bg-white rounded-md shadow-md z-10">
+            {dynamicOptions.cuisine.dropdown
+              .filter((option) =>
+                option.toLowerCase().includes((pair.customInput || "").toLowerCase())
+              )
+              .map((option) => (
+                <button
+                  key={option}
+                  onClick={() => {
+                    setParameterValuePairs((prev) =>
+                      prev.map((p, i) =>
+                        i === index
+                          ? { ...p, customInput: option, showDropdown: false }
+                          : p
+                      )
+                    );
+                  }}
+                  className="w-full text-left p-2 hover:bg-gray-100"
+                >
+                  {option}
+                </button>
+              ))}
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+)}
+
 
 							{pair.parameter === "Diet" && (
 								<div className="mt-4">
 									<p className="text-md text-gray-700 mb-2">
 										Select dietary preferences:
 									</p>
-									<ChipSelector
-										options={dietOptions}
-										selectedValue={pair.value}
-										onSelect={(value) => handleValueSelect(index, value)}
-									/>
-								</div>
-							)}
-
-							{pair.parameter === "Course" && (
-								<div className="mt-4">
-									<p className="text-md text-gray-700 mb-2">
-										Select the course of the meal:
-									</p>
-									<ChipSelector
-										options={courseOptions}
-										selectedValue={pair.value}
-										onSelect={(value) => handleValueSelect(index, value)}
-									/>
+									<div className="flex flex-wrap gap-2 mb-4">
+										{dynamicOptions.diet.chips.map((diet, idx) => (
+											<button
+												key={idx}
+												onClick={() => handleValueSelect(index, diet)}
+												className={`py-1 px-3 rounded-full ${
+													pair.value === diet
+														? "bg-indigo-600 text-white"
+														: "bg-indigo-200 text-indigo-700 hover:bg-indigo-300"
+												}`}
+											>
+												{diet}
+											</button>
+										))}
+										<button
+											onClick={() => handleValueSelect(index, "Other")}
+											className={`py-1 px-3 rounded-full ${
+												pair.value === "Other"
+													? "bg-red-600 text-white"
+													: "bg-red-200 text-red-700 hover:bg-red-300"
+											}`}
+										>
+											Other
+										</button>
+									</div>
+									{pair.value === "Other" && (
+										<AutocompletePopover
+											options={dynamicOptions.diet.dropdown}
+											onSelect={(value) => handleValueSelect(index, value)}
+											placeholder="e.g., Vegan, Vegetarian"
+										/>
+									)}
 								</div>
 							)}
 
