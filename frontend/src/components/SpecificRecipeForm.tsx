@@ -150,15 +150,15 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 					pair.values.length === 0 &&
 					pair.avoidValues.length === 0)
 		);
-	
+
 		if (isFormEmpty) {
 			alert("Please add at least one parameter or value before submitting.");
 			return;
 		}
-	
+
 		try {
 			setIsLoading(true);
-	
+
 			// Sync customInput to value whenever customInput is present
 			const updatedPairs = parameterValuePairs.map((pair) => {
 				if (pair.customInput) {
@@ -166,9 +166,9 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 				}
 				return pair;
 			});
-	
+
 			console.log("Payload sent to backend:", updatedPairs);
-	
+
 			await onFormSubmit(updatedPairs);
 		} catch (error) {
 			console.error("Error submitting the form:", error);
@@ -176,8 +176,7 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 			setIsLoading(false);
 		}
 	};
-	
-	
+
 	return (
 		<TooltipProvider>
 			<div className="p-4">
@@ -271,25 +270,28 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 
 									{/* Render chips for top 6 */}
 									<div className="flex flex-wrap gap-2 mb-4">
-										{dynamicOptions.cuisine.chips.map((cuisine, idx) => (
-											<button
-												key={idx}
-												onClick={() => {
-													setParameterValuePairs((prev) =>
-														prev.map((p, i) =>
-															i === index ? { ...p, value: cuisine } : p
-														)
-													);
-												}}
-												className={`py-1 px-3 rounded-full ${
-													pair.value === cuisine
-														? "bg-indigo-600 text-white"
-														: "bg-indigo-200 text-indigo-700 hover:bg-indigo-300"
-												}`}
-											>
-												{cuisine}
-											</button>
-										))}
+										{dynamicOptions.cuisine.chips
+											.filter((cuisine) => cuisine !== "NA") // Exclude "NA"
+											.slice(0, 6) // Take the top 6
+											.map((cuisine, idx) => (
+												<button
+													key={idx}
+													onClick={() => {
+														setParameterValuePairs((prev) =>
+															prev.map((p, i) =>
+																i === index ? { ...p, value: cuisine } : p
+															)
+														);
+													}}
+													className={`py-1 px-3 rounded-full ${
+														pair.value === cuisine
+															? "bg-indigo-600 text-white"
+															: "bg-indigo-200 text-indigo-700 hover:bg-indigo-300"
+													}`}
+												>
+													{cuisine}
+												</button>
+											))}
 
 										{/* Render "Other" chip */}
 										<button
@@ -410,25 +412,28 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 
 									{/* Render chips for top 6 */}
 									<div className="flex flex-wrap gap-2 mb-4">
-										{dynamicOptions.diet.chips.map((diet, idx) => (
-											<button
-												key={idx}
-												onClick={() => {
-													setParameterValuePairs((prev) =>
-														prev.map((p, i) =>
-															i === index ? { ...p, value: diet } : p
-														)
-													);
-												}}
-												className={`py-1 px-3 rounded-full ${
-													pair.value === diet
-														? "bg-indigo-600 text-white"
-														: "bg-indigo-200 text-indigo-700 hover:bg-indigo-300"
-												}`}
-											>
-												{diet}
-											</button>
-										))}
+										{dynamicOptions.diet.chips
+											.filter((cuisine) => cuisine !== "NA") // Exclude "NA"
+											.slice(0, 6) // Take the top 6
+											.map((cuisine, idx) => (
+												<button
+													key={idx}
+													onClick={() => {
+														setParameterValuePairs((prev) =>
+															prev.map((p, i) =>
+																i === index ? { ...p, value: cuisine } : p
+															)
+														);
+													}}
+													className={`py-1 px-3 rounded-full ${
+														pair.value === cuisine
+															? "bg-indigo-600 text-white"
+															: "bg-indigo-200 text-indigo-700 hover:bg-indigo-300"
+													}`}
+												>
+													{cuisine}
+												</button>
+											))}
 
 										{/* Render "Other" chip */}
 										<button
@@ -550,25 +555,28 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 
 									{/* Render chips for top 6 */}
 									<div className="flex flex-wrap gap-2 mb-4">
-										{dynamicOptions.course.chips.map((course, idx) => (
-											<button
-												key={idx}
-												onClick={() => {
-													setParameterValuePairs((prev) =>
-														prev.map((p, i) =>
-															i === index ? { ...p, value: course } : p
-														)
-													);
-												}}
-												className={`py-1 px-3 rounded-full ${
-													pair.value === course
-														? "bg-indigo-600 text-white"
-														: "bg-indigo-200 text-indigo-700 hover:bg-indigo-300"
-												}`}
-											>
-												{course}
-											</button>
-										))}
+										{dynamicOptions.course.chips
+											.filter((cuisine) => cuisine !== "NA") // Exclude "NA"
+											.slice(0, 6) // Take the top 6
+											.map((cuisine, idx) => (
+												<button
+													key={idx}
+													onClick={() => {
+														setParameterValuePairs((prev) =>
+															prev.map((p, i) =>
+																i === index ? { ...p, value: cuisine } : p
+															)
+														);
+													}}
+													className={`py-1 px-3 rounded-full ${
+														pair.value === cuisine
+															? "bg-indigo-600 text-white"
+															: "bg-indigo-200 text-indigo-700 hover:bg-indigo-300"
+													}`}
+												>
+													{cuisine}
+												</button>
+											))}
 
 										{/* Render "Other" chip */}
 										<button
@@ -703,7 +711,7 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 									<input
 										type="text"
 										className="w-60 p-2 border border-gray-300 rounded-md"
-										placeholder="e.g., Nuts, Dairy, Soy"
+										placeholder="e.g., Nuts, milk, Soy (not braod topics)"
 										onChange={(e) =>
 											handleAvoidInputChange(index, e.target.value)
 										}
