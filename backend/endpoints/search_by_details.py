@@ -18,13 +18,14 @@ def search_by_details():
         normalized_criteria = [
             {
                 "parameter": criterion["parameter"],
-                "value": criterion["value"].strip() if criterion["value"].strip() else None,
-                "values": [v.strip() for v in criterion.get("values", []) if v.strip()],
+                "value": (criterion.get("value") or "").strip(),  # Ensure value is always a string
+                "values": criterion.get("values", []),
                 "custom": "customInput" in criterion and bool(criterion["customInput"]),
             }
             for criterion in search_criteria
             if "parameter" in criterion and ("value" in criterion or "values" in criterion)
         ]
+
 
         print("Normalized criteria:", normalized_criteria)
 
@@ -33,7 +34,7 @@ def search_by_details():
 
         def resolve_parent_entity(ingredient):
             """
-            Resolves the parent entity of an ingredient based on `has_scientific_name`.
+            Resolves the parent entity of an ingredient based on `has_scientific_name` and `has_alt_labels` with language tags.
             """
             for entity in ontology.individuals():
                 labels = []
@@ -51,6 +52,20 @@ def search_by_details():
                         labels.extend(scientific_names)
                         print(f"Scientific names for {entity}: {scientific_names}")
 
+                    # Collect alt labels with language tags
+                    if hasattr(entity, "has_alt_labels"):
+                        for label in getattr(entity, "has_alt_labels", []):
+                            if hasattr(label, "lang"):  # If the label has a language tag
+                                lang_tag = label.lang
+                                label_text = str(label).lower()
+                                labels.append(label_text)
+                                print(f"Alt label with lang for {entity}: {lang_tag} -> {label_text}")
+                            else:
+                                # If there's no language tag, treat it as a general alt label
+                                label_text = str(label).lower()
+                                labels.append(label_text)
+                                print(f"Alt label without lang for {entity}: {label_text}")
+
                 except Exception as e:
                     print(f"Error processing entity {entity}: {e}")
                     continue
@@ -66,6 +81,8 @@ def search_by_details():
 
             return None  # No match found
 
+
+
         # Apply filters progressively
         for criterion in normalized_criteria:
             parameter = criterion["parameter"]
@@ -75,27 +92,21 @@ def search_by_details():
 
             if parameter == "Ingredient":
                 resolved_entities = []
-                ingredients_to_check = ([value] if value else []) + values
-
-                for ing in ingredients_to_check:
-                    if ing.strip():  # Skip empty strings
+                for ing in (criterion.get("values", []) if not value else [value]):
+                    if ing:  # Skip empty strings
                         resolved_entity = resolve_parent_entity(ing.lower())
                         if resolved_entity:
                             resolved_entities.append(resolved_entity)
 
-                # Updated filtering logic for Ingredient
-            if resolved_entities:
-                resolved_names = [
-                    str(entity.name).lower() for entity in resolved_entities
-                ]  # Extract simplified names from resolved entities
-                matched_recipes = [
-                    recipe for recipe in matched_recipes
-                    if hasattr(recipe, "hasActualIngredients") and any(
-                        ingredient.lower() in resolved_names
-                        for ingredient in getattr(recipe, "hasActualIngredients", [])
-                    )
-                ]
-
+                if resolved_entities:
+                    matched_recipes = [
+                        recipe for recipe in matched_recipes
+                        if any(
+                            fuzz.partial_ratio(resolved_entity.name.lower(), str(actual_ingredient).lower()) > 80
+                            for resolved_entity in resolved_entities
+                            for actual_ingredient in getattr(recipe, "hasActualIngredients", [])
+                        )
+                    ]
 
             elif parameter == "Cook Time":
                 matched_recipes = [
