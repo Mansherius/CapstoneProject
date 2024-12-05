@@ -20,17 +20,34 @@ def search_by_details():
                 "parameter": criterion["parameter"],
                 "value": (criterion.get("value") or "").strip(),  # Ensure value is always a string
                 "values": criterion.get("values", []),
+                "avoidValues": criterion.get("avoidValues", []),  # Capture avoid values
                 "custom": "customInput" in criterion and bool(criterion["customInput"]),
             }
             for criterion in search_criteria
-            if "parameter" in criterion and ("value" in criterion or "values" in criterion)
+            if "parameter" in criterion and ("value" in criterion or "values" in criterion or "avoidValues" in criterion)
         ]
-
 
         print("Normalized criteria:", normalized_criteria)
 
         # Start with all recipes
         matched_recipes = list(ontology.individuals())
+
+        # Allergen Exclusion Logic (Absolute Precedence)
+        for criterion in normalized_criteria:
+            if "avoidValues" in criterion and criterion["avoidValues"]:
+                avoid_values = criterion["avoidValues"]
+                print(f"Excluding recipes with allergens: {avoid_values}")
+
+                matched_recipes = [
+                    recipe for recipe in matched_recipes
+                    if not any(
+                        fuzz.partial_ratio(avoid.lower(), str(actual_ingredient).lower()) > 80
+                        for avoid in avoid_values
+                        for actual_ingredient in getattr(recipe, "hasActualIngredients", [])
+                    )
+                ]
+
+        print(f"Recipes after allergen exclusion: {len(matched_recipes)}")
 
         def resolve_parent_entity(ingredient):
             """
@@ -98,8 +115,6 @@ def search_by_details():
                 return combined_results[0]
 
             return None  # No match found
-
-
 
         # Apply filters progressively
         for criterion in normalized_criteria:
