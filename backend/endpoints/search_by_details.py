@@ -18,11 +18,12 @@ def search_by_details():
         normalized_criteria = [
             {
                 "parameter": criterion["parameter"],
-                "value": criterion["value"].strip(),
+                "value": criterion["value"].strip() if criterion["value"].strip() else None,
+                "values": [v.strip() for v in criterion.get("values", []) if v.strip()],
                 "custom": "customInput" in criterion and bool(criterion["customInput"]),
             }
             for criterion in search_criteria
-            if "parameter" in criterion and "value" in criterion and criterion["value"].strip()
+            if "parameter" in criterion and ("value" in criterion or "values" in criterion)
         ]
 
         print("Normalized criteria:", normalized_criteria)
@@ -30,24 +31,71 @@ def search_by_details():
         # Start with all recipes
         matched_recipes = list(ontology.individuals())
 
+        def resolve_parent_entity(ingredient):
+            """
+            Resolves the parent entity of an ingredient based on `has_scientific_name`.
+            """
+            for entity in ontology.individuals():
+                labels = []
+
+                try:
+                    # Collect preferred labels
+                    if hasattr(entity, "has_pref_label"):
+                        pref_label = str(entity.has_pref_label).lower()
+                        labels.append(pref_label)
+                        print(f"Preferred label for {entity}: {pref_label}")
+
+                    # Collect scientific names
+                    if hasattr(entity, "has_scientific_name"):
+                        scientific_names = [str(name).lower() for name in getattr(entity, "has_scientific_name", [])]
+                        labels.extend(scientific_names)
+                        print(f"Scientific names for {entity}: {scientific_names}")
+
+                except Exception as e:
+                    print(f"Error processing entity {entity}: {e}")
+                    continue
+
+                # Check for matches
+                try:
+                    if any(fuzz.partial_ratio(ingredient.lower(), label) > 80 for label in labels):
+                        print(f"Match found for {ingredient} in {entity} with labels: {labels}")
+                        return entity
+                except Exception as e:
+                    print(f"Error matching ingredient '{ingredient}' in {entity}: {e}")
+                    continue
+
+            return None  # No match found
+
         # Apply filters progressively
         for criterion in normalized_criteria:
             parameter = criterion["parameter"]
-            value = criterion["value"].lower()
+            value = criterion["value"].lower() if criterion["value"] else None
+            values = criterion["values"]
             is_custom = criterion["custom"]
 
             if parameter == "Ingredient":
+                resolved_entities = []
+                ingredients_to_check = ([value] if value else []) + values
+
+                for ing in ingredients_to_check:
+                    if ing.strip():  # Skip empty strings
+                        resolved_entity = resolve_parent_entity(ing.lower())
+                        if resolved_entity:
+                            resolved_entities.append(resolved_entity)
+
+                # Updated filtering logic for Ingredient
+            if resolved_entities:
+                resolved_names = [
+                    str(entity.name).lower() for entity in resolved_entities
+                ]  # Extract simplified names from resolved entities
                 matched_recipes = [
-                    recipe
-                    for recipe in matched_recipes
-                    if all(
-                        any(
-                            fuzz.partial_ratio(ing.lower(), str(i).lower()) > 80 if is_custom else ing.lower() == str(i).lower()
-                            for i in recipe.hasActualIngredients
-                        )
-                        for ing in [value]
+                    recipe for recipe in matched_recipes
+                    if hasattr(recipe, "hasActualIngredients") and any(
+                        ingredient.lower() in resolved_names
+                        for ingredient in getattr(recipe, "hasActualIngredients", [])
                     )
                 ]
+
 
             elif parameter == "Cook Time":
                 matched_recipes = [
