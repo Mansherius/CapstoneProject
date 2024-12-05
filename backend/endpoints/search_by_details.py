@@ -34,50 +34,68 @@ def search_by_details():
 
         def resolve_parent_entity(ingredient):
             """
-            Resolves the parent entity of an ingredient based on `has_scientific_name` and `has_alt_labels` with language tags.
+            Resolves the parent entity of an ingredient based on:
+            1. Exact match on preferred label, scientific name, or alt label.
+            2. Match on individual words in labels.
+            3. Fuzzy match as a fallback for partial matches.
             """
-            for entity in ontology.individuals():
-                labels = []
+            exact_matches = set()
+            word_matches = set()
+            fuzzy_matches = set()
+            ingredient_lower = ingredient.lower()
 
+            for entity in ontology.individuals():
                 try:
-                    # Collect preferred labels
+                    labels = {}
+
+                    # Collect preferred label
                     if hasattr(entity, "has_pref_label"):
                         pref_label = str(entity.has_pref_label).lower()
-                        labels.append(pref_label)
-                        print(f"Preferred label for {entity}: {pref_label}")
+                        labels["pref_label"] = pref_label
 
                     # Collect scientific names
                     if hasattr(entity, "has_scientific_name"):
                         scientific_names = [str(name).lower() for name in getattr(entity, "has_scientific_name", [])]
-                        labels.extend(scientific_names)
-                        print(f"Scientific names for {entity}: {scientific_names}")
+                        labels["scientific_names"] = scientific_names
 
-                    # Collect alt labels with language tags
+                    # Collect alt labels
                     if hasattr(entity, "has_alt_labels"):
-                        for label in getattr(entity, "has_alt_labels", []):
-                            if hasattr(label, "lang"):  # If the label has a language tag
-                                lang_tag = label.lang
-                                label_text = str(label).lower()
-                                labels.append(label_text)
-                                print(f"Alt label with lang for {entity}: {lang_tag} -> {label_text}")
-                            else:
-                                # If there's no language tag, treat it as a general alt label
-                                label_text = str(label).lower()
-                                labels.append(label_text)
-                                print(f"Alt label without lang for {entity}: {label_text}")
+                        alt_labels = [str(label).lower() for label in getattr(entity, "has_alt_labels", [])]
+                        labels["alt_labels"] = alt_labels
+
+                    # Flatten all labels for comparison
+                    all_labels = [labels["pref_label"]] + labels.get("scientific_names", []) + labels.get("alt_labels", [])
+
+                    # 1. Exact match for the full input
+                    if ingredient_lower in all_labels:
+                        print(f"Exact match for '{ingredient}' in {entity} with labels: {all_labels}")
+                        exact_matches.add(entity)
+                        continue  # Skip to the next entity if we find an exact match
+
+                    # 2. Match for individual words
+                    ingredient_words = set(ingredient_lower.split())
+                    for label in all_labels:
+                        label_words = set(label.split())
+                        if ingredient_words & label_words:  # Common words exist
+                            print(f"Word match for '{ingredient}' in {entity} with label: '{label}'")
+                            word_matches.add(entity)
+                            break
+
+                    # 3. Fuzzy match for partial matches
+                    if any(fuzz.partial_ratio(ingredient_lower, label) > 80 for label in all_labels):
+                        print(f"Fuzzy match for '{ingredient}' in {entity} with labels: {all_labels}")
+                        fuzzy_matches.add(entity)
 
                 except Exception as e:
                     print(f"Error processing entity {entity}: {e}")
                     continue
 
-                # Check for matches
-                try:
-                    if any(fuzz.partial_ratio(ingredient.lower(), label) > 80 for label in labels):
-                        print(f"Match found for {ingredient} in {entity} with labels: {labels}")
-                        return entity
-                except Exception as e:
-                    print(f"Error matching ingredient '{ingredient}' in {entity}: {e}")
-                    continue
+            # Combine results, prioritizing exact and word matches over fuzzy matches
+            combined_results = list(exact_matches) or list(word_matches) or list(fuzzy_matches)
+
+            if combined_results:
+                print(f"Returning closest match for '{ingredient}' from {combined_results}")
+                return combined_results[0]
 
             return None  # No match found
 
