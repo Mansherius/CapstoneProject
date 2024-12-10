@@ -145,8 +145,10 @@ def search_by_details():
                 matched_recipes = [
                     recipe
                     for recipe in matched_recipes
-                    if hasattr(recipe, "hasCookTime") and value == str(getattr(recipe, "hasCookTime", [None])[0]).lower()
+                    if hasattr(recipe, "hasCookTime") and
+                    any(value.strip().lower() == str(cook_time).strip().lower() for cook_time in getattr(recipe, "hasCookTime", []))
                 ]
+
 
             elif parameter == "Cuisine":
                 matched_recipes = [
