@@ -15,7 +15,7 @@ export default function Home() {
     >
       {/* Intro Section */}
       <div className="flex flex-col items-center text-md text-gray-700 z-10 mb-10">
-        This is the developer's application to be used to edit, view and test
+        This is the developer's application for viewing and testing
         the Food Knowledge Graph Capstone Project.
       </div>
 
@@ -36,13 +36,13 @@ export default function Home() {
         </div>
 
         {/* Description */}
-        <p className="font-medium text-md text-wrap py-2 text-gray-600 text-center">
+        {/* <p className="font-medium text-md text-wrap py-2 text-gray-600 text-center">
           There are 2 methods to query the Knowledge graph - NLP Queries and placeholder queries using forms.
-        </p>
+        </p> */}
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-          <Tooltip content="Currently Disabled">
+          {/* <Tooltip content="Currently Disabled">
           <a
             className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
             href=""
@@ -52,14 +52,14 @@ export default function Home() {
           >
             NLP Query
           </a>
-          </Tooltip>
+          </Tooltip> */}
           <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
+            className="rounded-full font-bold text-xl border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
             href="/dashboard/forms"
             target=""
             rel="noopener noreferrer"
           >
-            Forms Query
+          Qeurying the FKG
           </a>
         </div>
       </main>
