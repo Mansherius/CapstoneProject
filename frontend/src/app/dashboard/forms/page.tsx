@@ -99,6 +99,11 @@ const FormsQuery = () => {
 		}
 	};
 
+	// Function to reload the page
+	const handleReset = () => {
+		window.location.reload();
+	};
+
 	return (
 		<TooltipProvider>
 			<div className="p-5 bg-white rounded-lg shadow-md">
@@ -168,6 +173,16 @@ const FormsQuery = () => {
 					) : (
 						<SpecificRecipeForm onFormSubmit={handleSearchByDetails} />
 					)}
+				</div>
+
+				{/* Reset Button */}
+				<div className="text-center mb-6">
+					<button
+						className="bg-indigo-800 text-indigo-300 font-bold py-3 px-6 rounded hover:bg-indigo-600"
+						onClick={handleReset}
+					>
+						Reset Search
+					</button>
 				</div>
 
 				{/* Results */}

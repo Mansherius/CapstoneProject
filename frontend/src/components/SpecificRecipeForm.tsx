@@ -242,7 +242,7 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 									<div className="flex items-center space-x-4">
 										<input
 											type="range"
-											min={5}
+											min={1}
 											max={120}
 											step={1}
 											value={parseInt(pair.value) || 30}
@@ -743,6 +743,7 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 				</div>
 
 				<div className="pt-6 flex justify-end">
+					
 					<button
 						onClick={handleSubmit}
 						disabled={isLoading}
