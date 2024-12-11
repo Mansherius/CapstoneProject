@@ -2,7 +2,7 @@ import React from 'react';
 
 const Instructions = () => {
   return (
-    <div className="p-6 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg shadow-lg">
+    <div className="p-5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg shadow-lg">
 				<div className="bg-indigo-100 p-6 rounded-md shadow-md mb-6 text-center">
 					<h2 className="font-bold text-4xl text-indigo-800 mb-4">
           How to Use the Food Knowledge Graph (FKG)
@@ -54,10 +54,8 @@ const Instructions = () => {
           </li>
         </ul>
         <p className="mt-4">
-          <span className="font-bold">Considerations:</span> Be specific with your inputs to get the most accurate results. For instance, use <span className="font-bold">"Green Peas"</span> instead of just <span className="font-bold">"Peas."</span>
-          <p>
+          <span className="font-bold">Considerations:</span> Be specific with your inputs to get the most accurate results. For instance, use <span className="font-bold">"Green Peas"</span> instead of just <span className="font-bold">"Peas."</span> {" "}
             Furthermore, whenever you want to search using more details, you need to select one item from the chip selectors, then click on the <span className='font-bold'>"Add more details"</span> button and then choose from the new chip selectors.
-          </p>
         </p>
       </div>
 

@@ -27,41 +27,52 @@ const FormsQuery = () => {
 
 	// Search by name function
 	const handleSearchByName = async () => {
+		const mainIngredients = (document.getElementById("mainIngredientsInput") as HTMLInputElement)?.value || "";
+		const allergens = (document.getElementById("allergensInput") as HTMLInputElement)?.value || "";
+	  
 		console.log("Searching by Recipe Name:", searchQuery);
+		console.log("Main Ingredients:", mainIngredients);
+		console.log("Allergens:", allergens);
+	  
 		setIsLoading(true);
-
+	  
 		try {
-			const response = await fetch(
-				`http://127.0.0.1:5001/api/search-by-name?query=${searchQuery}`,
-				{
-					method: "GET",
-					headers: {
-						"Content-Type": "application/json",
-					},
-				}
-			);
-
-			if (!response.ok) {
-				throw new Error("Failed to fetch search results");
+		  const response = await fetch(
+			`http://127.0.0.1:5001/api/search-by-name`,
+			{
+			  method: "POST",
+			  headers: {
+				"Content-Type": "application/json",
+			  },
+			  body: JSON.stringify({
+				name: searchQuery,
+				mainIngredients: mainIngredients.split(",").map((i) => i.trim()),
+				allergens: allergens.split(",").map((i) => i.trim()),
+			  }),
 			}
-
-			const data = await response.json();
-
-			// Map backend response dynamically to include all properties
-			const formattedResults: RecipeResult[] = data.map((item: any) => ({
-				name: item.name,
-				properties: item.properties || {}, // Dynamically include all properties
-				type: item.type || "N/A",
-			}));
-
-			setResults(formattedResults);
+		  );
+	  
+		  if (!response.ok) {
+			throw new Error("Failed to fetch search results");
+		  }
+	  
+		  const data = await response.json();
+	  
+		  const formattedResults: RecipeResult[] = data.map((item: any) => ({
+			name: item.name,
+			properties: item.properties || {}, // Dynamically include all properties
+			type: item.type || "N/A",
+		  }));
+	  
+		  setResults(formattedResults);
 		} catch (error) {
-			console.error("Error searching for recipes:", error);
-			setResults([]); // Clear results on error
+		  console.error("Error searching for recipes:", error);
+		  setResults([]); // Clear results on error
 		} finally {
-			setIsLoading(false);
+		  setIsLoading(false);
 		}
-	};
+	  };
+	  
 
 	// Handle form submission from SpecificRecipeForm
 	const handleSearchByDetails = async (formData: any) => {
@@ -151,29 +162,49 @@ const FormsQuery = () => {
 
 				{/* Search Forms */}
 				<div className="mb-6">
-					{useCase === "byName" ? (
-						<div className="flex items-center w-full max-w-2xl mx-auto">
-							<input
-								type="text"
-								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
-								placeholder="Type a recipe name..."
-								className="flex-grow p-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-							/>
-							<button
-								onClick={handleSearchByName}
-								disabled={isLoading}
-								className={`bg-indigo-600 text-white py-3 px-6 rounded-r-md hover:bg-indigo-500 ${
-									isLoading ? "opacity-50 cursor-not-allowed" : ""
-								}`}
-							>
-								{isLoading ? "Loading..." : "Search"}
-							</button>
-						</div>
-					) : (
-						<SpecificRecipeForm onFormSubmit={handleSearchByDetails} />
-					)}
-				</div>
+  {useCase === "byName" ? (
+    <div className="flex flex-col space-y-4 w-full max-w-2xl mx-auto">
+      {/* Recipe Name Input */}
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder="Type a recipe name..."
+        className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+
+      {/* Main Ingredients Input */}
+      <input
+        type="text"
+        id="mainIngredientsInput"
+        placeholder="Main ingredients (comma-separated)..."
+        className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+
+      {/* Allergens Input */}
+      <input
+        type="text"
+        id="allergensInput"
+        placeholder="Allergens to exclude (comma-separated)..."
+        className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+      />
+
+      {/* Search Button */}
+      <button
+        onClick={() => handleSearchByName()}
+        disabled={isLoading}
+        className={`bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-500 ${
+          isLoading ? "opacity-50 cursor-not-allowed" : ""
+        }`}
+      >
+        {isLoading ? "Loading..." : "Search"}
+      </button>
+    </div>
+  ) : (
+    <SpecificRecipeForm onFormSubmit={handleSearchByDetails} />
+  )}
+</div>
+
 
 				{/* Reset Button */}
 				<div className="text-center mb-6">
