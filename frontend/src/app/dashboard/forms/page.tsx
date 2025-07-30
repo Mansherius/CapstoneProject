@@ -58,7 +58,7 @@ const FormsQuery = () => {
 	  
 		  const data = await response.json();
 	  
-		  const formattedResults: RecipeResult[] = data.map((item: any) => ({
+		  const formattedResults: RecipeResult[] = data.map((item: Record<string, any>) => ({
 			name: item.name,
 			properties: item.properties || {}, // Dynamically include all properties
 			type: item.type || "N/A",
@@ -95,7 +95,7 @@ const FormsQuery = () => {
 			const data = await response.json();
 
 			// Map backend response dynamically to include all properties
-			const formattedResults: RecipeResult[] = data.map((item: any) => ({
+			const formattedResults: RecipeResult[] = data.map((item: Record<string, any>) => ({
 				name: item.name,
 				properties: item.properties || {}, // Dynamically include all properties
 				type: item.type || "N/A",
@@ -126,7 +126,7 @@ const FormsQuery = () => {
 					</h2>
 					<p className="text-lg text-gray-700 px-8">
 						Ready to discover your next favorite dish? Simply fill out the
-						details below, and we'll handle the rest!
+						details below, and we&apos;ll handle the rest!
 					</p>
 				</div>
 

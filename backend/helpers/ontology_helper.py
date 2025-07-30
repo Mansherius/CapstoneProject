@@ -1,7 +1,14 @@
+import os
 from owlready2 import get_ontology
 
-# Load ontology once and reuse across all endpoints
-ONTOLOGY_PATH = '/Users/manshersingh/Documents/Coding Projects/capstoneProject/data/final_ifct_csv_json.owl'
+# Get absolute path to the *project root* (i.e., capstoneProject/)
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+# Build the full path to the ontology file
+DEFAULT_PATH = os.path.join(PROJECT_ROOT, "data", "final_ifct_csv_json.owl")
+
+# Use env var if set, otherwise default to constructed path
+ONTOLOGY_PATH = os.getenv("ONTOLOGY_PATH", DEFAULT_PATH)
 
 def load_ontology():
     """Load the ontology file."""

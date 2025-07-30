@@ -1,6 +1,6 @@
 import { BackgroundBeams } from "@/components/ui/backgroundBeams";
 import Image from "next/image";
-import { Tooltip } from "@/components/ui/toolTip";
+// import { Tooltip } from "@/components/ui/toolTip";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 export default function Home() {
@@ -15,7 +15,7 @@ export default function Home() {
     >
       {/* Intro Section */}
       <div className="flex flex-col items-center text-md text-gray-700 z-10 mb-10">
-        This is the developer's application for viewing and testing
+        This is the developer&apos;s application for viewing and testing
         the Food Knowledge Graph Capstone Project.
       </div>
 

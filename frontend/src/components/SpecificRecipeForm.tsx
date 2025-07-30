@@ -181,7 +181,7 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 		<TooltipProvider>
 			<div className="p-4">
 				<div className="font-bold text-3xl text-indigo-700 mb-4">
-					Let's figure out what to cook
+					Let&apos;s figure out what to cook
 				</div>
 				{parameterValuePairs.map((pair, index) => (
 					<div key={index} className="my-6 p-4 rounded-md bg-gray-50 shadow-md">
