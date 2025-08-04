@@ -1,12 +1,13 @@
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-    async rewrites() {
-      return [
-        {
-          source: '/api/:path*',
-          destination: 'http://localhost:5001/api/:path*',  // Proxy to Flask backend
-        },
-      ];
-    },
-  };
-  
-  export default nextConfig;
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: process.env.NEXT_PUBLIC_API_BASE + '/api/:path*',
+      },
+    ];
+  },
+};
+
+export default nextConfig;

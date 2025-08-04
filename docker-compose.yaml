@@ -1,0 +1,47 @@
+# services:
+#   backend:
+#     build:
+#       context: ./backend
+#     container_name: food-backend
+#     ports:
+#       - "5001:5001"
+#     volumes:
+#       - ./data:/app/data  # Mount external ontology file
+#     environment:
+#       - ONTOLOGY_PATH=/app/data/final_ifct_csv_json.owl
+
+#   frontend:
+#     build:
+#       context: ./frontend
+#       args: 
+#         NEXT_PUBLIC_API_BASE: http://food-backend:5001  # Build-time env var
+#     container_name: food-frontend
+#     ports:
+#       - "3000:3000"
+#     depends_on:
+#       - backend
+#     environment:
+#       - NEXT_PUBLIC_API_BASE=http://food-backend:5001  # Run-time env var
+
+
+
+services:
+  backend:
+    image: mansherius/capstone-project:backend-v1.0.0 # put the required image here.
+    container_name: food-backend
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./data:/app/data  # Mount external ontology file
+    environment:
+      - ONTOLOGY_PATH=/app/data/final_ifct_csv_json.owl
+
+  frontend:
+    image: mansherius/capstone-project:frontend-v1.0.1 # put the required image here.
+    container_name: food-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_API_BASE=http://food-backend:5001

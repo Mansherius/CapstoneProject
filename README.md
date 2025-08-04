@@ -65,23 +65,13 @@ This project builds on top of a food knowledge graph (FKG) curated over 1.5 year
 
 ## 🧾 How to Run Locally
 
-### Prerequisites
-- Node.js
-- Python 3.10+
-- Pipenv / virtualenv
+Docker has been configured and the application has been containerised. The user only needs to install docker on their system for this to run.
 
-### Backend Setup
+### Instruction 
 ```bash
-cd backend
-pip install -r requirements.txt
-python main.py  # or uvicorn if using FastAPI
-```
-
-### Frontend Setup
-```bash
-cd frontend
-npm install
-npm run dev
+docker compose down --volumes --remove-orphans
+docker compose pull
+docker compose up
 ```
 
 ### Ontology File
