@@ -34,28 +34,12 @@ spec:
 
 ```
 
-Create a YAML file (e.g., `k8s/ontology-pvc.yaml`) with the following content:
-
-```yaml
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: ontology-pvc
-spec:
-  accessModes:
-    - ReadOnlyMany
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: standard
-```
-
 > **Explanation**: This defines a claim for a volume of 1Gi that allows **read-only** access by multiple pods. We use a standard storage class provided by Minikube.
 
 Apply it using:
 
 ```bash
-kubectl apply -f k8s/ontology-pvc.yaml
+kubectl apply -f k8s/persistentVolume.yaml
 ```
 
 ---
