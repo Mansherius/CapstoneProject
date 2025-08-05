@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ontology-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadOnlyMany
+  hostPath:
+    path: "/Users/manshersingh/Documents/Coding Projects/capstoneProject/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ontology-pvc
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 1Gi

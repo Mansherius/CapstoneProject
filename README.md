@@ -70,12 +70,18 @@ Docker has been configured and the application has been containerised. The user 
 ### Instruction 
 ```bash
 docker compose down --volumes --remove-orphans
-docker compose pull
+docker compose pull # May or may not be required based on your systems till now
 docker compose up
 ```
-
+Your system must contain the `.env.local` and `.env.local.production` files
 ### Ontology File
 Place your `.owl` food knowledge graph file inside the backend directory or update its path inside the config.
+ 
+---
+
+## Concerns for K8s
+
+If requried to manually set up the persistent volumes, follow the instructions under the k8s-volumes.md file
 
 ---
 

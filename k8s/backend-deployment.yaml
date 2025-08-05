@@ -1,0 +1,32 @@
+apiVersion: apps/v1 # for Deployments
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend # Setting the label for the pod
+spec:
+  replicas: 1
+  selector: # Tells k8s which pods it must apply this to and control
+    matchLabels:
+      app: backend 
+  template:
+    metadata: 
+      labels:
+        app: backend # For the pods themselves. must be the same as the selector above.
+    spec:
+      containers:
+        - name: backend-container
+          image: mansherius/capstone-project:backend-v1.0.0
+          ports:
+            - containerPort: 5001
+          env:
+            - name: ONTOLOGY_PATH
+              value: /app/data/final_ifct_csv_json.owl
+          volumeMounts: 
+            - name: ontology-volume
+              mountPath: /app/data
+              readOnly: true
+      volumes:
+        - name: ontology-volume
+          persistentVolumeClaim:
+            claimName: ontology-pvc

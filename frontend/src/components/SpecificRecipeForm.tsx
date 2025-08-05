@@ -114,7 +114,8 @@ const EnhancedRecipeForm: React.FC<EnhancedRecipeFormProps> = ({
 	useEffect(() => {
 		const fetchOptions = async () => {
 			try {
-				const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/unique-values`);
+				const response = await fetch(`/api/unique-values`);
+				// const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/unique-values`);
 				if (!response.ok) {
 					throw new Error("Failed to fetch unique values");
 				}

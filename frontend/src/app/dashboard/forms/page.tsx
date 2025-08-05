@@ -38,7 +38,8 @@ const FormsQuery = () => {
 	  
 		try {
 		  const response = await fetch(
-			`${process.env.NEXT_PUBLIC_API_BASE}/api/search-by-name`,
+			`/api/search-by-name`,
+			// `${process.env.NEXT_PUBLIC_API_BASE}/api/search-by-name`,
 			{
 			  method: "POST",
 			  headers: {
@@ -80,7 +81,8 @@ const FormsQuery = () => {
 		setIsLoading(true);
 
 		try {
-			const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/search-by-details`, {
+			const response = await fetch(`/api/search-by-details`, {
+			// const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/search-by-details`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
